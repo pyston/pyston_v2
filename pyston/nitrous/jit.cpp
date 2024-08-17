@@ -188,8 +188,8 @@ TargetMachine& LLVMCompiler::getTargetMachine() {
 void* LLVMCompiler::compile(unique_ptr<Module> module, ThreadSafeContext context, const string& funcname) {
     ExitOnError ExitOnErr;
 
-    auto TSM = ThreadSafeModule(std::move(module), move(context));
-    ExitOnErr(jit->addModule(move(TSM)));
+    auto TSM = ThreadSafeModule(std::move(module), std::move(context));
+    ExitOnErr(jit->addModule(std::move(TSM)));
 
     auto Sym = ExitOnErr(jit->lookup(funcname));
     RELEASE_ASSERT(Sym, "uh oh");
@@ -414,7 +414,7 @@ LLVMJit::InlineInfo LLVMJit::inlineFunction(CallInst* call,
     //outs() << "after inlining:\n";
     //outs() << *module << '\n';
 
-    return { move(ifi.StaticAllocas) };
+    return { std::move(ifi.StaticAllocas) };
 }
 
 class NitrousAAResult : public AAResultBase<NitrousAAResult> {
@@ -679,7 +679,7 @@ char RemoveICmpPtrPass::ID = 0;
 
 vector<function<FunctionPass*(LLVMEvaluator& eval)>> pass_factories;
 void registerPassFactory(function<FunctionPass*(LLVMEvaluator& eval)> factory) {
-    pass_factories.push_back(move(factory));
+    pass_factories.push_back(std::move(factory));
 }
 
 void LLVMJit::optimizeFunc(LLVMEvaluator& eval) {
@@ -1144,7 +1144,7 @@ void* LLVMJit::finish(LLVMEvaluator& eval) {
     struct timespec start, end;
     if (nitrous_verbosity >= NITROUS_VERBOSITY_STATS)
         clock_gettime(CLOCK_REALTIME, &start);
-    auto r = compiler->compile(move(module), *llvm_context, func->getName().str());
+    auto r = compiler->compile(std::move(module), *llvm_context, func->getName().str());
 
     if (nitrous_verbosity >= NITROUS_VERBOSITY_STATS) {
         clock_gettime(CLOCK_REALTIME, &end);

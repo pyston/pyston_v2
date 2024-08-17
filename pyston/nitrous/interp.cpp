@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <stdarg.h>
 
 #include <ffi.h>
 
@@ -141,7 +142,7 @@ static pair<unique_ptr<Module>, unique_ptr<MemoryBuffer>> loadBitcodeFile(const 
     unique_ptr<Module> module;
     module = ExitOnErr(getLazyBitcodeModule(*MB, getContext()));
 
-    return make_pair(move(module), move(MB));
+    return make_pair(std::move(module), std::move(MB));
 }
 
 class BitcodeRegistry {
@@ -174,8 +175,8 @@ public:
         */
         data_layout = &module->getDataLayout();
 
-        loaded_modules.push_back(move(module));
-        loaded_module_data.push_back(move(module_and_buf.second));
+        loaded_modules.push_back(std::move(module));
+        loaded_module_data.push_back(std::move(module_and_buf.second));
     }
 
     Function* findFunction(string name) {

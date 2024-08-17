@@ -330,7 +330,7 @@ private:
                 op_facts = getFacts(incoming, at, facts, tree, indent + 2);
 
                 if (i == 0)
-                    phi_facts = move(op_facts);
+                    phi_facts = std::move(op_facts);
                 else
                     intersectInto(op_facts, phi_facts);
             }
@@ -592,11 +592,11 @@ Location Location::gepDest(int offset, int size) const {
     for (int i = 1; i < indirections.size(); i++)
         new_indirections.push_back(indirections[i]);
 
-    return Location(move(new_indirections));
+    return Location(std::move(new_indirections));
 }
 
 void registerFactDeriver(unique_ptr<FactDeriver> deriver) {
-    fact_derivers.push_back(move(deriver));
+    fact_derivers.push_back(std::move(deriver));
 }
 
 } // namespace nitrous
